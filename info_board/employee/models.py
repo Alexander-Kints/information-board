@@ -5,9 +5,9 @@ class Employee(models.Model):
     first_name = models.CharField(max_length=64)
     patronymic = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
-    academic_degree = models.CharField(max_length=64, null=True)
-    academic_status = models.CharField(max_length=64, null=True)
-    current_positions = ArrayField(models.CharField(max_length=128), null=True)
+    academic_degree = models.CharField(max_length=64, null=True, blank=True)
+    academic_status = models.CharField(max_length=64, null=True, blank=True)
+    current_positions = ArrayField(models.CharField(max_length=128), null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Employee, Contact
+from info_board.employee.models import Employee, Contact
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
