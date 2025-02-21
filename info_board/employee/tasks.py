@@ -1,51 +1,97 @@
 import requests
 from bs4 import BeautifulSoup
 from base64 import b64decode
+import time
+import os
+import logging
+from django.db import transaction
+from info_board.employee.models import Employee, Contact
+from info_board.employee.utils import page_count_employee, parse_name, clear_data
 
-url = 'https://www.pgups.ru/employee/?PAGEN_2=1&SIZEN_2=20'
-resp = requests.get(url)
-soup = BeautifulSoup(resp.text, 'lxml')
+PARSE_DELAY_SEC = 3
 
-info_tables = soup.find_all('div', class_='table faculty')
 
-# for pers in info_tables:
-#     print(pers.find('a', class_='title').get_text(strip=True))
+def parse_employee_info():
+    url = os.environ.get('EMPLOYEE_URL')
+    pages_count = page_count_employee(url.format(1))
 
-pers = info_tables[9]
-full_name = pers.find('a', itemprop="fio").get_text(strip=True)
-name_arr = full_name.split(' ')
-# TODO full_name из 2 или 4 слов
-last_name = name_arr[0]
-first_name = name_arr[1]
-patronymic = name_arr[2]
-academic_degree = pers.find('dd', itemprop="Degree")
-academic_status = pers.find('dd', itemprop="AcademStat")
+    for page_number in range(1, pages_count + 1):
+        resp = requests.get(url.format(page_number))
+        if not resp.ok:
+            logging.warning(f'url: {url}, page {page_number}, resp status: {resp.status_code}')
+            continue
 
-positions = pers.find('dd', itemprop="post")
-pos_arr = list()
-if positions:
-    items = list(filter(lambda s: s, map(lambda el: el.get_text(strip=True), positions.contents)))
-    print(items)
-    for item in ' '.join(items).split(' , '):
-        print(item.strip())
+        soup = BeautifulSoup(resp.text, 'lxml')
+        info_tables = soup.find_all('div', class_='table faculty')
+        if not info_tables:
+            logging.warning(f'div table faculty not found on page {page_number}')
+            continue
 
-print(first_name)
-print(patronymic)
-print(last_name)
-print(academic_degree.get_text(strip=True) if academic_degree else None)
-print(academic_status.get_text(strip=True) if academic_status else None)
+        for table in info_tables:
+            new_contacts = list()
 
-phones = pers.find('div', itemprop='telephone')
-if phones:
-    items = list(filter(lambda s: s, map(lambda el: el.get_text(strip=True), phones.contents)))
-    print(items)
+            full_name = table.find('a', itemprop='fio').get_text(strip=True).split(' ')
+            last_name, first_name, patronymic = parse_name(full_name)
 
-email = pers.find('a', itemprop='e-mail')
+            academic_degree = table.find('dd', itemprop='Degree')
+            if academic_degree:
+                academic_degree = academic_degree.get_text(strip=True)
 
-print(b64decode(email.get_text(strip=True)).decode('utf-8') if email else None)
+            academic_status = table.find('dd', itemprop='AcademStat')
+            if academic_status:
+                academic_status = academic_status.get_text(strip=True)
 
-has_address = pers.find('i', class_='user-icon map')
-if has_address:
-    print(list(filter(lambda s: s != '\n', has_address.parent.parent.contents))[1].get_text(strip=True))
-    address = has_address.parent.next_sibling
-    # print(address.get_text(strip=True))
+            positions = table.find('dd', itemprop='post')
+            if positions:
+                positions = clear_data(positions.contents, '')
+                positions = [item.strip() for item in ' '.join(positions).split(' , ')]
+
+            phones = table.find('div', itemprop='telephone')
+            if phones:
+                phones = clear_data(phones.contents, '')
+                for phone in phones:
+                    new_contacts.append(Contact(
+                        contact_type=Contact.ContactType.PHONE,
+                        value=phone
+                    ))
+
+            email = table.find('a', itemprop='e-mail')
+            if email:
+                email = b64decode(email.get_text(strip=True)).decode('utf-8')
+                new_contacts.append(Contact(
+                    contact_type=Contact.ContactType.EMAIL,
+                    value=email
+                ))
+
+            address = table.find('i', class_='user-icon map')
+            if address:
+                address = clear_data(address.parent.parent.contents, '\n', '')
+                address = address.pop() if address else None
+                new_contacts.append(Contact(
+                    contact_type=Contact.ContactType.ADDRESS,
+                    value=address
+                ))
+            try:
+                with transaction.atomic():
+                    employee, _ = Employee.objects.get_or_create(
+                        first_name=first_name,
+                        patronymic=patronymic,
+                        last_name=last_name
+                    )
+                    employee.academic_degree = academic_degree
+                    employee.academic_status = academic_status
+                    employee.current_positions = positions
+                    employee.save()
+
+                    employee.contacts.all().delete()
+                    for contact in new_contacts:
+                        contact.employee = employee
+                        contact.save()
+            except Exception as e:
+                logging.error(f'url {url}, page {page_number}, error: {e}')
+            else:
+                logging.info(
+                    f'updated employee: {first_name} {patronymic} {last_name}'
+                )
+        logging.info(f'page {page_number} was parsed')
+        time.sleep(PARSE_DELAY_SEC)

@@ -3,7 +3,7 @@ from info_board.employee.models import Employee, Contact
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'patronymic', 'last_name']
+    list_display = ['first_name', 'patronymic', 'last_name', 'updated_at']
 
 
 @admin.register(Contact)
