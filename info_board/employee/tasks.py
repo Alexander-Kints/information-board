@@ -4,6 +4,7 @@ from base64 import b64decode
 import time
 import os
 import logging
+from celery import shared_task
 from django.db import transaction
 from info_board.employee.models import Employee, Contact
 from info_board.employee.utils import page_count_employee, parse_name, clear_data
@@ -11,6 +12,7 @@ from info_board.employee.utils import page_count_employee, parse_name, clear_dat
 PARSE_DELAY_SEC = 3
 
 
+@shared_task
 def parse_employee_info():
     url = os.environ.get('EMPLOYEE_URL')
     pages_count = page_count_employee(url.format(1))
