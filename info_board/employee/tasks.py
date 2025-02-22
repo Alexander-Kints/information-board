@@ -1,13 +1,15 @@
+import logging
+import os
+import time
+from base64 import b64decode
+
 import requests
 from bs4 import BeautifulSoup
-from base64 import b64decode
-import time
-import os
-import logging
 from celery import shared_task
 from django.db import transaction
-from info_board.employee.models import Employee, Contact
-from info_board.employee.utils import page_count_employee, parse_name, clear_data
+from info_board.employee.models import Contact, Employee
+from info_board.employee.utils import (clear_data, page_count_employee,
+                                       parse_name)
 
 PARSE_DELAY_SEC = 3
 
@@ -20,19 +22,25 @@ def parse_employee_info():
     for page_number in range(1, pages_count + 1):
         resp = requests.get(url.format(page_number))
         if not resp.ok:
-            logging.warning(f'url: {url}, page {page_number}, resp status: {resp.status_code}')
+            logging.warning(
+                f'url: {url}, page {page_number}, resp status: {resp.status_code}'
+            )
             continue
 
         soup = BeautifulSoup(resp.text, 'lxml')
         info_tables = soup.find_all('div', class_='table faculty')
         if not info_tables:
-            logging.warning(f'div table faculty not found on page {page_number}')
+            logging.warning(
+                f'div table faculty not found on page {page_number}'
+            )
             continue
 
         for table in info_tables:
             new_contacts = list()
 
-            full_name = table.find('a', itemprop='fio').get_text(strip=True).split(' ')
+            full_name = table.find(
+                'a', itemprop='fio'
+            ).get_text(strip=True).split(' ')
             last_name, first_name, patronymic = parse_name(full_name)
 
             academic_degree = table.find('dd', itemprop='Degree')
@@ -46,7 +54,9 @@ def parse_employee_info():
             positions = table.find('dd', itemprop='post')
             if positions:
                 positions = clear_data(positions.contents, '')
-                positions = [item.strip() for item in ' '.join(positions).split(' , ')]
+                positions = [
+                    item.strip() for item in ' '.join(positions).split(' , ')
+                ]
 
             phones = table.find('div', itemprop='telephone')
             if phones:

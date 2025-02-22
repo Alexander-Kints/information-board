@@ -1,6 +1,8 @@
+from typing import List
+
 import requests
 from bs4 import BeautifulSoup, PageElement
-from typing import List
+
 
 def page_count_employee(url: str) -> int:
     resp = requests.get(url)
@@ -13,6 +15,7 @@ def page_count_employee(url: str) -> int:
     pages = clear_data(pages_raw_data.contents, '', '...', '»')
     return int(pages[-1])
 
+
 def clear_data(content: List[PageElement], *exclude_elements) -> List[str]:
     return list(
         filter(
@@ -23,6 +26,7 @@ def clear_data(content: List[PageElement], *exclude_elements) -> List[str]:
             )
         )
     )
+
 
 def parse_name(full_name: List[str]):
     last_name = full_name[0]
