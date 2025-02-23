@@ -1,6 +1,7 @@
+parse_delay_sec: 3
+
 employee:
   parse_url: 'https://www.pgups.ru/employee/?PAGEN_2={}&SIZEN_2=20'
-  delay_sec: 3
 
 schedule:
   parse_url: 'https://rasp.pgups.ru/files/b/{}/{}_{}.xlsx'
@@ -18,4 +19,3 @@ schedule:
     - 3
     - 4
     - 5
-    - 6

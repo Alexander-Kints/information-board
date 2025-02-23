@@ -112,4 +112,4 @@ def parse_employee_info():
                     f'updated employee: {first_name} {patronymic} {last_name}'
                 )
         logging.info(f'page {page_number} was parsed')
-        time.sleep(main_config.employee.delay_sec)
+        time.sleep(main_config.parse_delay_sec)

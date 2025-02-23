@@ -8,7 +8,6 @@ from marshmallow_dataclass import class_schema
 @dataclass
 class EmployeeConfig:
     parse_url: str
-    delay_sec: int
 
 
 @dataclass
@@ -23,6 +22,7 @@ class ScheduleConfig:
 class MainConfig:
     employee: EmployeeConfig
     schedule: ScheduleConfig
+    parse_delay_sec: int
 
 
 config_path = os.path.join(
@@ -36,5 +36,3 @@ with open(config_path) as config_file:
 
 
 main_config: MainConfig = class_schema(MainConfig)().load(config_data)
-
-print(main_config)
