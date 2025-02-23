@@ -4,6 +4,7 @@ import time
 from base64 import b64decode
 
 import requests
+from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 from celery import shared_task
 from django.db import transaction
@@ -20,7 +21,14 @@ def parse_employee_info():
     pages_count = page_count_employee(url.format(1))
 
     for page_number in range(1, pages_count + 1):
-        resp = requests.get(url.format(page_number))
+        try:
+            resp = requests.get(url.format(page_number))
+        except RequestException as e:
+            logging.error(
+                f'fatal error while parsing employee: {e}'
+            )
+            return None
+
         if not resp.ok:
             logging.warning(
                 f'url: {url}, page {page_number}, resp status: {resp.status_code}'

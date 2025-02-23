@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
     'info_board.employee',
+    'info_board.schedule',
 ]
 
 MIDDLEWARE = [
