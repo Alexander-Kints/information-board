@@ -5,7 +5,6 @@ from requests.exceptions import RequestException
 import logging
 import os
 import pandas as pd
-import re
 
 def download_file(url: str, file_path: str) -> bool:
     try:
@@ -77,7 +76,7 @@ def parse_schedule_info():
             print(' '.join(schedule_str_raw.split()))
             print('Неделя:', week_type)
 
-parse_schedule_info()
+#parse_schedule_info()
 
 
 # download_file(

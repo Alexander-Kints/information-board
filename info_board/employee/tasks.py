@@ -1,5 +1,4 @@
 import logging
-import os
 import time
 from base64 import b64decode
 
@@ -11,13 +10,12 @@ from django.db import transaction
 from info_board.employee.models import Contact, Employee
 from info_board.employee.utils import (clear_data, page_count_employee,
                                        parse_name)
-
-PARSE_DELAY_SEC = 3
+from info_board.config import main_config
 
 
 @shared_task
 def parse_employee_info():
-    url = os.environ.get('EMPLOYEE_URL')
+    url = main_config.employee.parse_url
     pages_count = page_count_employee(url.format(1))
 
     for page_number in range(1, pages_count + 1):
@@ -114,4 +112,4 @@ def parse_employee_info():
                     f'updated employee: {first_name} {patronymic} {last_name}'
                 )
         logging.info(f'page {page_number} was parsed')
-        time.sleep(PARSE_DELAY_SEC)
+        time.sleep(main_config.employee.delay_sec)

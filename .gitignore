@@ -172,4 +172,5 @@ cython_debug/
 
 .idea
 *.xls*
-migrations/0*
+migrations
+config.yaml

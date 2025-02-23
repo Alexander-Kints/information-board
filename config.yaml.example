@@ -1,0 +1,21 @@
+employee:
+  parse_url: 'https://www.pgups.ru/employee/?PAGEN_2={}&SIZEN_2=20'
+  delay_sec: 3
+
+schedule:
+  parse_url: 'https://rasp.pgups.ru/files/b/{}/{}_{}.xlsx'
+  year: 2024
+  faculties:
+    - 'ait'
+    - 'pgs'
+    - 'ts'
+    - 'tes'
+    - 'eim'
+    - 'upl'
+  course_numbers:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
