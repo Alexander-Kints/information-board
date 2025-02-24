@@ -3,7 +3,7 @@ from info_board.employee.serializers import EmployeeSerializer
 from rest_framework.generics import ListAPIView
 
 
-class EmployeeListAPIView(ListAPIView):
+class EmployeeListView(ListAPIView):
     serializer_class = EmployeeSerializer
 
     def get_queryset(self):
