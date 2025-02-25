@@ -15,7 +15,7 @@ from info_board.schedule.models import ScheduleEntry, Faculty, StudentsGroup
 
 
 @shared_task
-def parse_schedule_info():
+def parse_schedule_info_excel():
     for faculty in main_config.schedule.faculties:
         for course_number in main_config.schedule.course_numbers:
             url = main_config.schedule.parse_url.format(
@@ -131,9 +131,9 @@ def parse_excel_to_db(file_path, course_number):
             else:
                 type_of_week = ScheduleEntry.TypesOfWeek.EVEN
 
-            entry = ' '.join(schedule_str_raw.split())
+            subject = ' '.join(schedule_str_raw.split())
             schedule_entry = ScheduleEntry(
-                entry=entry,
+                subject=subject,
                 day_of_week=days_storage[-1],
                 type_of_week=type_of_week,
                 study_time=times_storage[-1],

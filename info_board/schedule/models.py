@@ -53,7 +53,7 @@ class ScheduleEntry(models.Model):
         FOURTH = '1500-1630'
         FIFTH = '1645-1815'
 
-    entry = models.CharField(max_length=256)
+    subject = models.CharField(max_length=256)
     day_of_week = models.CharField(max_length=32, choices=DaysOfWeek)
     type_of_week = models.CharField(max_length=32, choices=TypesOfWeek)
     study_time = models.CharField(max_length=32, choices=StudyTimes)
