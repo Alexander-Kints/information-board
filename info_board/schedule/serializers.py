@@ -1,7 +1,9 @@
 from rest_framework.serializers import ModelSerializer, StringRelatedField
 from info_board.schedule.models import StudentsGroup, ScheduleEntry, Faculty
+from info_board.employee.serializers import EmployeeContactSerializer
 
 class ScheduleEntrySerializer(ModelSerializer):
+    employees = EmployeeContactSerializer(many=True, read_only=True)
     class Meta:
         model = ScheduleEntry
         exclude = ('id', 'students_group')

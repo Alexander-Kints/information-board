@@ -13,4 +13,4 @@ class StudentsGroupAdmin(admin.ModelAdmin):
 
 @admin.register(ScheduleEntry)
 class ScheduleEntryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'students_group', 'day_of_week', 'type_of_week', 'subject']
+    list_display = ['id', 'day_of_week', 'type_of_week', 'subject']
