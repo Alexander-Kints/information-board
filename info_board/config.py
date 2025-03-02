@@ -1,9 +1,11 @@
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
-import os
+
 import yaml
 from marshmallow_dataclass import class_schema
+
 
 @dataclass
 class EmployeeConfig:
@@ -13,6 +15,7 @@ class EmployeeConfig:
 @dataclass
 class ScheduleConfig:
     parse_url: str
+    parse_url_rasp: str
     year: int
     faculties: List[str]
     course_numbers: List[int]

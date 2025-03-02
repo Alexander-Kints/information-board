@@ -1,5 +1,7 @@
-from info_board.employee.models import Contact, Employee
 from rest_framework.serializers import ModelSerializer
+
+from info_board.employee.models import Contact, Employee
+
 
 class EmployeeSerializer(ModelSerializer):
     class Meta:

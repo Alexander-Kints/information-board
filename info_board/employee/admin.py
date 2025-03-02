@@ -1,10 +1,13 @@
 from django.contrib import admin
+
 from info_board.employee.models import Contact, Employee
 
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'first_name', 'patronymic', 'last_name', 'updated_at']
+    list_display = [
+        'id', 'first_name', 'patronymic', 'last_name', 'updated_at'
+    ]
 
 
 @admin.register(Contact)

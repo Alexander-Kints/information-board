@@ -3,14 +3,15 @@ import time
 from base64 import b64decode
 
 import requests
-from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 from celery import shared_task
 from django.db import transaction
+from requests.exceptions import RequestException
+
+from info_board.config import main_config
 from info_board.employee.models import Contact, Employee
 from info_board.employee.utils import (clear_data, page_count_employee,
                                        parse_name)
-from info_board.config import main_config
 
 
 @shared_task
@@ -29,7 +30,7 @@ def parse_employee_info():
 
         if not resp.ok:
             logging.warning(
-                f'url: {url}, page {page_number}, resp status: {resp.status_code}'
+                f'url: {url}, page {page_number}, status: {resp.status_code}'
             )
             continue
 

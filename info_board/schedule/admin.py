@@ -1,5 +1,7 @@
 from django.contrib import admin
-from info_board.schedule.models import Faculty, StudentsGroup, ScheduleEntry
+
+from info_board.schedule.models import Faculty, ScheduleEntry, StudentsGroup
+
 
 @admin.register(Faculty)
 class FacultyAdmin(admin.ModelAdmin):

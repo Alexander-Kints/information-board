@@ -1,6 +1,7 @@
+from rest_framework.generics import ListAPIView
+
 from info_board.employee.models import Employee
 from info_board.employee.serializers import EmployeeContactSerializer
-from rest_framework.generics import ListAPIView
 
 
 class EmployeeListView(ListAPIView):
