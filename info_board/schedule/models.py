@@ -148,3 +148,7 @@ class ScheduleEntry(models.Model):
         }
 
         return change_data.get(time_value)
+
+    @property
+    def group_name(self):
+        return self.subgroup.group.name

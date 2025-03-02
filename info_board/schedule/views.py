@@ -3,11 +3,12 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from info_board.employee.models import Employee
 from info_board.schedule.models import (Faculty, ScheduleEntry, StudentsGroup,
                                         Subgroup)
 from info_board.schedule.serializers import (FacultyGroupSerializer,
                                              FacultySerializer,
-                                             GroupScheduleSerializer)
+                                             GroupScheduleSerializer, EmployeeScheduleSerializer)
 
 
 class GroupScheduleView(APIView):
@@ -88,4 +89,37 @@ class FacultyGroupView(APIView):
             )
 
         serializer = self.serializer_class(instance=faculty_groups)
+        return Response(serializer.data)
+
+
+class EmployeeScheduleView(APIView):
+    serializer_class = EmployeeScheduleSerializer
+
+    def get(self, request, employee_id):
+        type_of_week = request.GET.get('week')
+        choices = [el[0] for el in ScheduleEntry.TypesOfWeek.choices]
+
+        if type_of_week and type_of_week in choices:
+            employee = Employee.objects.filter(id=employee_id).prefetch_related(
+                Prefetch(
+                    'schedule_entries',
+                    queryset=ScheduleEntry.objects.filter(
+                        Q(type_of_week=type_of_week) |
+                        Q(type_of_week=ScheduleEntry.TypesOfWeek.ALWAYS)
+                    )
+                )
+            ).first()
+        else:
+            employee = Employee.objects.filter(id=employee_id).prefetch_related(
+                'schedule_entries'
+            ).first()
+
+        if not employee:
+            return Response(
+                {'message': f'schedule does not exist'},
+                status=404
+            )
+
+        serializer = self.serializer_class(instance=employee)
+
         return Response(serializer.data)

@@ -1,9 +1,9 @@
-from rest_framework.serializers import ModelSerializer, StringRelatedField
+from rest_framework.serializers import ModelSerializer, StringRelatedField, CharField
 
 from info_board.employee.models import Employee
 from info_board.schedule.models import (Faculty, ScheduleEntry, StudentsGroup,
                                         Subgroup)
-
+from info_board.employee.serializers import EmployeeContactSerializer
 
 class EmployeeSerializer(ModelSerializer):
     class Meta:
@@ -50,3 +50,17 @@ class FacultySerializer(ModelSerializer):
 
 class FacultyGroupSerializer(FacultySerializer):
     students_groups = GroupSerializer(many=True, read_only=True)
+
+
+class ScheduleEntryGroupSerializer(ModelSerializer):
+    subgroup = StringRelatedField(read_only=True)
+    group_name = CharField(max_length=64)
+    employees = EmployeeSerializer(many=True, read_only=True)
+    room = StringRelatedField(read_only=True)
+    class Meta:
+        model = ScheduleEntry
+        fields = '__all__'
+
+
+class EmployeeScheduleSerializer(EmployeeContactSerializer):
+    schedule_entries = ScheduleEntryGroupSerializer(many=True, read_only=True)

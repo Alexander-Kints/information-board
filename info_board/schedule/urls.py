@@ -10,4 +10,8 @@ urlpatterns = [
         'faculties-groups/<int:faculty_id>/',
         views.FacultyGroupView.as_view()
     ),
+    path(
+        'employee-schedule/<int:employee_id>/',
+        views.EmployeeScheduleView.as_view()
+    )
 ]
