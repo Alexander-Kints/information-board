@@ -1,13 +1,19 @@
+import logging.config
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+from logger_config import logger_config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # load .env
 load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+# logger config
+logging.config.dictConfig(logger_config)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
@@ -18,8 +24,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(',')
 
 # Application definition
 
@@ -85,11 +90,11 @@ WSGI_APPLICATION = 'info_board.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('PGSQL_DBNAME'),
-        'USER': os.environ.get('PGSQL_USER'),
-        'PASSWORD': os.environ.get('PGSQL_PASSWORD'),
-        'HOST': os.environ.get('PGSQL_HOST'),
-        'PORT': os.environ.get('PGSQL_PORT'),
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': os.environ.get('POSTGRES_PORT'),
     }
 }
 

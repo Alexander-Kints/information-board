@@ -174,3 +174,4 @@ cython_debug/
 *.xls*
 migrations
 config.yaml
+.docker

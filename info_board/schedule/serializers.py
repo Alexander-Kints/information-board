@@ -1,9 +1,11 @@
-from rest_framework.serializers import ModelSerializer, StringRelatedField, CharField
+from rest_framework.serializers import (CharField, ModelSerializer,
+                                        StringRelatedField)
 
 from info_board.employee.models import Employee
+from info_board.employee.serializers import EmployeeContactSerializer
 from info_board.schedule.models import (Faculty, ScheduleEntry, StudentsGroup,
                                         Subgroup)
-from info_board.employee.serializers import EmployeeContactSerializer
+
 
 class EmployeeSerializer(ModelSerializer):
     class Meta:

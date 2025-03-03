@@ -1,6 +1,6 @@
 from django.db.models import Prefetch, Q
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,10 +8,10 @@ from rest_framework.views import APIView
 from info_board.employee.models import Employee
 from info_board.schedule.models import (Faculty, ScheduleEntry, StudentsGroup,
                                         Subgroup)
-from info_board.schedule.serializers import (FacultyGroupSerializer,
+from info_board.schedule.serializers import (EmployeeScheduleSerializer,
+                                             FacultyGroupSerializer,
                                              FacultySerializer,
-                                             GroupScheduleSerializer,
-                                             EmployeeScheduleSerializer)
+                                             GroupScheduleSerializer)
 
 
 class GroupScheduleView(APIView):
