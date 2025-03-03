@@ -1,4 +1,6 @@
 from django.db.models import Prefetch, Q
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,12 +10,24 @@ from info_board.schedule.models import (Faculty, ScheduleEntry, StudentsGroup,
                                         Subgroup)
 from info_board.schedule.serializers import (FacultyGroupSerializer,
                                              FacultySerializer,
-                                             GroupScheduleSerializer, EmployeeScheduleSerializer)
+                                             GroupScheduleSerializer,
+                                             EmployeeScheduleSerializer)
 
 
 class GroupScheduleView(APIView):
     serializer_class = GroupScheduleSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='week',
+                type=OpenApiTypes.STR,
+                description='Четность недели: even, odd, now(в разработке)',
+                location=OpenApiParameter.QUERY,
+                required=False
+            )
+        ]
+    )
     def get(self, request, group_id):
         type_of_week = request.GET.get('week')
         choices = [el[0] for el in ScheduleEntry.TypesOfWeek.choices]
@@ -61,6 +75,17 @@ class FacultyGroupListView(ListAPIView):
 class FacultyGroupView(APIView):
     serializer_class = FacultyGroupSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='course',
+                type=OpenApiTypes.INT,
+                description='Номер курса',
+                location=OpenApiParameter.QUERY,
+                required=False
+            )
+        ]
+    )
     def get(self, request, faculty_id):
         course_number = request.GET.get('course')
 
@@ -95,6 +120,17 @@ class FacultyGroupView(APIView):
 class EmployeeScheduleView(APIView):
     serializer_class = EmployeeScheduleSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='week',
+                type=OpenApiTypes.STR,
+                description='Четность недели: even, odd, now(в разработке)',
+                location=OpenApiParameter.QUERY,
+                required=False
+            )
+        ]
+    )
     def get(self, request, employee_id):
         type_of_week = request.GET.get('week')
         choices = [el[0] for el in ScheduleEntry.TypesOfWeek.choices]

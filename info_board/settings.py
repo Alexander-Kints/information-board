@@ -43,7 +43,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Docs',
+    'TITLE': 'Swagger',
     'DESCRIPTION': 'API киоск ПГУПС (тестовая версия)',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
