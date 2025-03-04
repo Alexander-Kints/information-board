@@ -1,11 +1,11 @@
 up:
-	sudo docker-compose up -d
+	sudo docker compose up -d
 
 build:
-	sudo docker-compose up --build -d
+	sudo docker compose up --build -d
 
 restart:
-	sudo docker-compose restart
+	sudo docker compose restart
 
 down:
-	sudo docker-compose down
+	sudo docker compose down
