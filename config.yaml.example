@@ -5,6 +5,7 @@ employee:
 
 schedule:
   parse_url: 'https://rasp.pgups.ru/files/b/{}/{}_{}.xlsx'
+  parse_url_rasp: 'https://rasp.pgups.ru/search?page={}'
   year: 2024
   faculties:
     - 'ait'
