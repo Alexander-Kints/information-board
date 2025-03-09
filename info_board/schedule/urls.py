@@ -13,5 +13,6 @@ urlpatterns = [
     path(
         'employee-schedule/<int:employee_id>/',
         views.EmployeeScheduleView.as_view()
-    )
+    ),
+    path('search/', views.SearchScheduleView.as_view()),
 ]

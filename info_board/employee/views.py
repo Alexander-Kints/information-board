@@ -1,9 +1,10 @@
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.generics import ListAPIView
 
 from info_board.employee.models import Employee
 from info_board.employee.serializers import EmployeeContactSerializer
+
 
 @extend_schema(
     parameters=[

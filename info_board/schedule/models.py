@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 from info_board.employee.models import Employee
 
@@ -35,6 +36,13 @@ class StudentsGroup(models.Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def find_by_query(cls, query: str):
+        return cls.objects.filter(
+            Q(name__icontains=query) |
+            Q(faculty__short_name__icontains=query)
+        ).order_by('name')
+
 
 class Room(models.Model):
     name = models.CharField(max_length=64)
@@ -44,6 +52,10 @@ class Room(models.Model):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def find_by_query(cls, query: str):
+        return cls.objects.filter(name__icontains=query)
 
 
 class Subgroup(models.Model):

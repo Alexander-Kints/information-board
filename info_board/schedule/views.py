@@ -5,17 +5,14 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import info_board.schedule.serializers as serializers
 from info_board.employee.models import Employee
-from info_board.schedule.models import (Faculty, ScheduleEntry, StudentsGroup,
-                                        Subgroup)
-from info_board.schedule.serializers import (EmployeeScheduleSerializer,
-                                             FacultyGroupSerializer,
-                                             FacultySerializer,
-                                             GroupScheduleSerializer)
+from info_board.schedule.models import (Faculty, Room, ScheduleEntry,
+                                        StudentsGroup, Subgroup)
 
 
 class GroupScheduleView(APIView):
-    serializer_class = GroupScheduleSerializer
+    serializer_class = serializers.GroupScheduleSerializer
 
     @extend_schema(
         parameters=[
@@ -63,17 +60,17 @@ class GroupScheduleView(APIView):
 
 
 class FacultyListView(ListAPIView):
-    serializer_class = FacultySerializer
+    serializer_class = serializers.FacultySerializer
     queryset = Faculty.objects.all()
 
 
 class FacultyGroupListView(ListAPIView):
-    serializer_class = FacultyGroupSerializer
+    serializer_class = serializers.FacultyGroupSerializer
     queryset = Faculty.objects.prefetch_related('students_groups').all()
 
 
 class FacultyGroupView(APIView):
-    serializer_class = FacultyGroupSerializer
+    serializer_class = serializers.FacultyGroupSerializer
 
     @extend_schema(
         parameters=[
@@ -118,7 +115,7 @@ class FacultyGroupView(APIView):
 
 
 class EmployeeScheduleView(APIView):
-    serializer_class = EmployeeScheduleSerializer
+    serializer_class = serializers.EmployeeScheduleSerializer
 
     @extend_schema(
         parameters=[
@@ -136,7 +133,9 @@ class EmployeeScheduleView(APIView):
         choices = [el[0] for el in ScheduleEntry.TypesOfWeek.choices]
 
         if type_of_week and type_of_week in choices:
-            employee = Employee.objects.filter(id=employee_id).prefetch_related(
+            employee = Employee.objects.filter(
+                id=employee_id
+            ).prefetch_related(
                 Prefetch(
                     'schedule_entries',
                     queryset=ScheduleEntry.objects.filter(
@@ -146,16 +145,58 @@ class EmployeeScheduleView(APIView):
                 )
             ).first()
         else:
-            employee = Employee.objects.filter(id=employee_id).prefetch_related(
+            employee = Employee.objects.filter(
+                id=employee_id
+            ).prefetch_related(
                 'schedule_entries'
             ).first()
 
         if not employee:
             return Response(
-                {'message': f'schedule does not exist'},
+                {'message': 'schedule does not exist'},
                 status=404
             )
 
         serializer = self.serializer_class(instance=employee)
 
         return Response(serializer.data)
+
+
+class SearchScheduleView(APIView):
+    serializer_class = serializers.SearchSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='query',
+                type=OpenApiTypes.STR,
+                description='Поиск групп, преподавателей, аудиторий',
+                location=OpenApiParameter.QUERY,
+                required=True
+            )
+        ]
+    )
+    def get(self, request):
+        query = request.GET.get('query')
+
+        if not query:
+            return Response({})
+
+        data = dict()
+
+        groups = StudentsGroup.find_by_query(query)
+        if groups:
+            data['groups'] = [
+                serializers.GroupSerializer(instance=group).data
+                for group in groups
+            ]
+
+        employees = Employee.find_by_query(query)
+        if employees:
+            data['employees'] = list(employees.values())
+
+        rooms = Room.find_by_query(query)
+        if rooms:
+            data['rooms'] = list(rooms.values())
+
+        return Response(data)

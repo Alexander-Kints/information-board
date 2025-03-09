@@ -105,14 +105,15 @@ def parse_excel_to_db(file_path, course_number):
             continue
 
         group, created = StudentsGroup.objects.get_or_create(
-            name=students_group,
-            course_number=course_number,
-            faculty=faculty
+            name=students_group
         )
         if not created:
             group.subgroups.all().delete()
 
         subgroup = Subgroup.objects.create(number=1, group=group)
+
+        group.course_number = course_number
+        group.faculty = faculty
         group.save()
 
         days_storage = list()
@@ -176,7 +177,9 @@ def parse_schedule_info_rasp() -> None:
                     group.subgroups.all().delete()
                     group.save()
 
-                    for subgroup_number, subgroup_url in enumerate(subgroup_urls):
+                    for subgroup_number, subgroup_url in enumerate(
+                            subgroup_urls
+                    ):
                         subgroup = Subgroup.objects.create(
                             number=subgroup_number + 1,
                             group=group
