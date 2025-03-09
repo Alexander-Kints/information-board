@@ -1,3 +1,5 @@
+from datetime import datetime as dt
+
 from django.db import models
 from django.db.models import Q
 
@@ -129,6 +131,10 @@ class ScheduleEntry(models.Model):
     class Meta:
         db_table = 'schedule_entry'
 
+    @property
+    def group_name(self):
+        return self.subgroup.group.name
+
     @classmethod
     def format_study_time(cls, time_range: str) -> str | None:
         try:
@@ -161,6 +167,7 @@ class ScheduleEntry(models.Model):
 
         return change_data.get(time_value)
 
-    @property
-    def group_name(self):
-        return self.subgroup.group.name
+    @classmethod
+    def week_type_now(cls) -> str:
+        week_number = dt.now().isocalendar().week
+        return cls.TypesOfWeek.ODD if week_number % 2 == 1 else cls.TypesOfWeek.EVEN

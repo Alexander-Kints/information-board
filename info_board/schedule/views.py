@@ -1,9 +1,10 @@
 from django.db.models import Prefetch, Q
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.serializers import CharField
 
 import info_board.schedule.serializers as serializers
 from info_board.employee.models import Employee
@@ -19,7 +20,7 @@ class GroupScheduleView(APIView):
             OpenApiParameter(
                 name='week',
                 type=OpenApiTypes.STR,
-                description='Четность недели: even, odd, now(в разработке)',
+                description='Четность недели: even, odd',
                 location=OpenApiParameter.QUERY,
                 required=False
             )
@@ -29,25 +30,23 @@ class GroupScheduleView(APIView):
         type_of_week = request.GET.get('week')
         choices = [el[0] for el in ScheduleEntry.TypesOfWeek.choices]
 
-        if type_of_week and type_of_week in choices:
-            group = StudentsGroup.objects.filter(pk=group_id).prefetch_related(
-                Prefetch(
-                    'subgroups',
-                    queryset=Subgroup.objects.prefetch_related(
-                        Prefetch(
-                            'schedule_entries',
-                            queryset=ScheduleEntry.objects.filter(
-                                Q(type_of_week=type_of_week) |
-                                Q(type_of_week=ScheduleEntry.TypesOfWeek.ALWAYS)
-                            )
+        if not type_of_week or type_of_week not in choices:
+            type_of_week = ScheduleEntry.week_type_now()
+
+        group = StudentsGroup.objects.filter(pk=group_id).prefetch_related(
+            Prefetch(
+                'subgroups',
+                queryset=Subgroup.objects.prefetch_related(
+                    Prefetch(
+                        'schedule_entries',
+                        queryset=ScheduleEntry.objects.filter(
+                            Q(type_of_week=type_of_week) |
+                            Q(type_of_week=ScheduleEntry.TypesOfWeek.ALWAYS)
                         )
                     )
                 )
-            ).first()
-        else:
-            group = StudentsGroup.objects.filter(
-                pk=group_id
-            ).prefetch_related('subgroups').first()
+            )
+        ).first()
 
         if not group:
             return Response(
@@ -122,7 +121,7 @@ class EmployeeScheduleView(APIView):
             OpenApiParameter(
                 name='week',
                 type=OpenApiTypes.STR,
-                description='Четность недели: even, odd, now(в разработке)',
+                description='Четность недели: even, odd',
                 location=OpenApiParameter.QUERY,
                 required=False
             )
@@ -132,24 +131,20 @@ class EmployeeScheduleView(APIView):
         type_of_week = request.GET.get('week')
         choices = [el[0] for el in ScheduleEntry.TypesOfWeek.choices]
 
-        if type_of_week and type_of_week in choices:
-            employee = Employee.objects.filter(
-                id=employee_id
-            ).prefetch_related(
-                Prefetch(
-                    'schedule_entries',
-                    queryset=ScheduleEntry.objects.filter(
-                        Q(type_of_week=type_of_week) |
-                        Q(type_of_week=ScheduleEntry.TypesOfWeek.ALWAYS)
-                    )
+        if not type_of_week or type_of_week not in choices:
+            type_of_week = ScheduleEntry.week_type_now()
+
+        employee = Employee.objects.filter(
+            id=employee_id
+        ).prefetch_related(
+            Prefetch(
+                'schedule_entries',
+                queryset=ScheduleEntry.objects.filter(
+                    Q(type_of_week=type_of_week) |
+                    Q(type_of_week=ScheduleEntry.TypesOfWeek.ALWAYS)
                 )
-            ).first()
-        else:
-            employee = Employee.objects.filter(
-                id=employee_id
-            ).prefetch_related(
-                'schedule_entries'
-            ).first()
+            )
+        ).first()
 
         if not employee:
             return Response(
@@ -158,7 +153,6 @@ class EmployeeScheduleView(APIView):
             )
 
         serializer = self.serializer_class(instance=employee)
-
         return Response(serializer.data)
 
 
@@ -200,3 +194,21 @@ class SearchScheduleView(APIView):
             data['rooms'] = list(rooms.values())
 
         return Response(data)
+
+
+class WeekTypeView(APIView):
+    @extend_schema(
+        description='Четность текущей недели',
+        responses={
+            200: inline_serializer(
+                name='WeekType',
+                fields={
+                    'week': CharField()
+                }
+            )
+        }
+    )
+    def get(self, request):
+        return Response({
+                "week": ScheduleEntry.week_type_now()
+        })

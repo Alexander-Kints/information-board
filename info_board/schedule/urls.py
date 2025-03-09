@@ -15,4 +15,5 @@ urlpatterns = [
         views.EmployeeScheduleView.as_view()
     ),
     path('search/', views.SearchScheduleView.as_view()),
+    path('week-type/', views.WeekTypeView.as_view()),
 ]
