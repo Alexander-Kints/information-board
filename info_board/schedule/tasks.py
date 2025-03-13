@@ -206,7 +206,7 @@ def get_subgroup_urls(url: str) -> list:
     resp = requests.get(url)
 
     if not resp.ok:
-        raise Exception(f'error while parsing {url}')
+        raise Exception(f'error while parsing (get_subgroup_urls) {url}')
 
     soup = BeautifulSoup(resp.text, 'lxml')
     subgroup_div = soup.find('div', class_='kt-portlet__head-group')
@@ -225,7 +225,7 @@ def subgroup_to_db(subgroup: Subgroup, subgroup_url, odd, week_type) -> None:
     url = f'{subgroup_url}?odd={odd}'
     resp = requests.get(url)
     if not resp.ok:
-        raise Exception(f'bad status code resp: {url}')
+        raise Exception(f'bad status code {resp.status_code} resp: {url}')
 
     soup = BeautifulSoup(resp.text, 'lxml')
 
@@ -316,7 +316,7 @@ def schedule_pages_count(url) -> int:
         return 0
 
     if not resp.ok:
-        logging.error(f'error while parsing {url}')
+        logging.error(f'error while parsing (schedule_pages_count) {url}')
         return 0
 
     soup = BeautifulSoup(resp.text, 'lxml')
@@ -333,7 +333,7 @@ def group_names_dict(url) -> dict:
     resp = requests.get(url)
 
     if not resp.ok:
-        logging.warning(f'error while parsing {url}')
+        logging.warning(f'error while parsing (group_names_dict) {url}')
         return groups
 
     soup = BeautifulSoup(resp.text, 'lxml')

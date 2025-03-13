@@ -1,4 +1,4 @@
-parse_delay_sec: 1
+parse_delay_sec: 3
 
 employee:
   parse_url: 'https://www.pgups.ru/employee/?PAGEN_2={}&SIZEN_2=20'
