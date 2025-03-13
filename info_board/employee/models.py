@@ -12,6 +12,7 @@ class Employee(models.Model):
         models.CharField(max_length=256), null=True, blank=True
     )
     updated_at = models.DateTimeField(auto_now=True)
+    photo = models.CharField(max_length=256)
 
     class Meta:
         db_table = 'employee'
@@ -19,7 +20,7 @@ class Employee(models.Model):
     def __str__(self):
         return '{} {} {}'.format(
             self.first_name,
-            self.patronymic,
+            self.patronymic if self.patronymic else '',
             self.last_name
         )
 

@@ -6,7 +6,7 @@ from info_board.employee.models import Contact, Employee
 class EmployeeSerializer(ModelSerializer):
     class Meta:
         model = Employee
-        fields = '__all__'
+        exclude = ('updated_at',)
 
 
 class ContactSerializer(ModelSerializer):
@@ -17,7 +17,3 @@ class ContactSerializer(ModelSerializer):
 
 class EmployeeContactSerializer(EmployeeSerializer):
     contacts = ContactSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Employee
-        fields = '__all__'

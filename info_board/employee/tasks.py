@@ -1,6 +1,7 @@
 import logging
 import time
 from base64 import b64decode
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -90,6 +91,16 @@ def parse_employee_info():
                     contact_type=Contact.ContactType.ADDRESS,
                     value=address
                 ))
+
+            photo = table.find('img')
+            if photo:
+                photo = urljoin(
+                    main_config.employee.base_photo_url,
+                    photo.get('src')
+                )
+            else:
+                photo = main_config.employee.default_photo
+
             try:
                 with transaction.atomic():
                     employee, _ = Employee.objects.get_or_create(
@@ -100,6 +111,7 @@ def parse_employee_info():
                     employee.academic_degree = academic_degree
                     employee.academic_status = academic_status
                     employee.current_positions = positions
+                    employee.photo = photo
                     employee.save()
 
                     employee.contacts.all().delete()

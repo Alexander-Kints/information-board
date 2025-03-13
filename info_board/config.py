@@ -10,6 +10,8 @@ from marshmallow_dataclass import class_schema
 @dataclass
 class EmployeeConfig:
     parse_url: str
+    base_photo_url: str
+    default_photo: str
 
 
 @dataclass

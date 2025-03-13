@@ -2,6 +2,8 @@ parse_delay_sec: 1
 
 employee:
   parse_url: 'https://www.pgups.ru/employee/?PAGEN_2={}&SIZEN_2=20'
+  base_photo_url: 'https://www.pgups.ru'
+  default_photo: 'https://www.pgups.ru/images/no-photo-user-available.png'
 
 schedule:
   parse_url: 'https://rasp.pgups.ru/files/b/{}/{}_{}.xlsx'
