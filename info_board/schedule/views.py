@@ -212,3 +212,46 @@ class WeekTypeView(APIView):
         return Response({
                 "week": ScheduleEntry.week_type_now()
         })
+
+
+class RoomScheduleView(APIView):
+    serializer_class = serializers.RoomScheduleSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='week',
+                type=OpenApiTypes.STR,
+                description='Четность недели: even, odd',
+                location=OpenApiParameter.QUERY,
+                required=False
+            )
+        ]
+    )
+    def get(self, request, room_id):
+        type_of_week = request.GET.get('week')
+        choices = [el[0] for el in ScheduleEntry.TypesOfWeek.choices]
+
+        if not type_of_week or type_of_week not in choices:
+            type_of_week = ScheduleEntry.week_type_now()
+
+        room = Room.objects.filter(
+            id=room_id
+        ).prefetch_related(
+            Prefetch(
+                'schedule_entries',
+                queryset=ScheduleEntry.objects.filter(
+                    Q(type_of_week=type_of_week) |
+                    Q(type_of_week=ScheduleEntry.TypesOfWeek.ALWAYS)
+                )
+            )
+        ).first()
+
+        if not room:
+            return Response(
+                {'message': 'schedule does not exist'},
+                status=404
+            )
+
+        serializer = self.serializer_class(instance=room)
+        return Response(serializer.data)

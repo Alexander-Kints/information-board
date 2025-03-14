@@ -10,7 +10,7 @@ from info_board.schedule.models import (Faculty, Room, ScheduleEntry,
 class EmployeeSerializer(ModelSerializer):
     class Meta:
         model = Employee
-        exclude = ('current_positions', 'updated_at')
+        exclude = ('current_positions', 'updated_at', 'photo')
 
 
 class ScheduleEntrySerializer(ModelSerializer):
@@ -73,6 +73,10 @@ class RoomSerializer(ModelSerializer):
     class Meta:
         model = Room
         fields = '__all__'
+
+
+class RoomScheduleSerializer(RoomSerializer):
+    schedule_entries = ScheduleEntryGroupSerializer(many=True, read_only=True)
 
 
 class SearchSerializer(Serializer):

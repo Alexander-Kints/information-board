@@ -155,6 +155,7 @@ def parse_excel_to_db(file_path, course_number):
             schedule_entry.save()
 
 
+# TODO: Сделать n попыток получения response (много 500-ых от rasp)
 @shared_task
 def parse_schedule_info_rasp() -> None:
     pages_count = schedule_pages_count(

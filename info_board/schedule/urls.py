@@ -16,4 +16,8 @@ urlpatterns = [
     ),
     path('search/', views.SearchScheduleView.as_view()),
     path('week-type/', views.WeekTypeView.as_view()),
+    path(
+        'room-schedule/<int:room_id>/',
+        views.RoomScheduleView.as_view()
+    ),
 ]
